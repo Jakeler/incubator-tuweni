@@ -13,17 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 version: "3"
+
 services:
-  jsonrpc:
-    container_name: jsonrpc
+
+  jsonrpc-proxy:
+    container_name: tuweni
     image: tuweni:2.3
     volumes:
       - ./config.toml:/etc/config.toml
-      - ./logback.xml:/usr/tuweni/bin/logback.xml
+      - ./logback.xml:/etc/logback.xml
+      - ./tuweni-cache:/var/rpc_cache
     entrypoint: /usr/bin/jsonrpc
     command: /etc/config.toml
+    depends_on:
+      - besu
     environment:
-      - JAVA_OPTS="-Dlogback.configurationFile=/usr/tuweni/bin/logback.xml"
+      - JAVA_OPTS="-Dlogback.configurationFile=/etc/logback.xml"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     ports:
       - 8080:8080
       - 9090:9090
