@@ -12,14 +12,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-endpointUrl="https://rpc.xdaichain.com/" # service URL
-port=8545
+
+endpointUrl="http://besu:8545" # service URL
+
+port=8080
 networkInterface="0.0.0.0"
+
 cacheEnabled=true
-cachedMethods=[""] # All methods are cached
-cacheStoragePath="/var/jsonrpccache" # Cache location
+cachedMethods=["trace_"]
+cacheStoragePath="/var/rpc_cache" # Cache location
+cacheLifespan=3600000 # 1h in ms
+cacheMaxIdle=600000 # 10 mins in ms
 allowedMethods=[""] # All methods are enabled
-metricsGrpcPushEnabled=true
-metricsPrometheusEnabled=false
-metricsGrpcTimeout=2000
-metricsGrpcEndpoint="http://otelcollector:4317"
+
+metricsGrpcPushEnabled=false
+metricsPrometheusEnabled=true
+metricsNetworkInterface="0.0.0.0"
+metricsPort=9090

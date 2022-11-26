@@ -16,30 +16,14 @@ version: "3"
 services:
   jsonrpc:
     container_name: jsonrpc
-    image: apache-tuweni/tuweni:2.1.0-SNAPSHOT
+    image: tuweni:2.3
     volumes:
       - ./config.toml:/etc/config.toml
       - ./logback.xml:/usr/tuweni/bin/logback.xml
-    entrypoint: /usr/tuweni/bin/jsonrpc
+    entrypoint: /usr/bin/jsonrpc
     command: /etc/config.toml
     environment:
       - JAVA_OPTS="-Dlogback.configurationFile=/usr/tuweni/bin/logback.xml"
     ports:
-      - 8545:8545
-  otelcollector:
-    container_name: otelcollector
-    image: otel/opentelemetry-collector-contrib:0.31.0
-    command: ["--config=/etc/otel-collector-config.yml", "--log-level=DEBUG"]
-    volumes:
-      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
-  metricsviewer:
-    image: docker.io/tmio/metrics-ui
-    container_name: metricsviewer
-    ports:
       - 8080:8080
-  # Zipkin
-  zipkin:
-    container_name: zipkin
-    image: openzipkin/zipkin
-    ports:
-      - 9411:9411
+      - 9090:9090
