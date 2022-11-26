@@ -23,6 +23,12 @@ Tuweni is developed for JDK 11 or higher.
     git submodule update --init --recursive
 
 ### Build the project ###
+#### recommended: in Docker ###
+```
+docker build -t tuweni:2.3 -f dist/docker/tuweni.Dockerfile .
+```
+
+
 #### With Gradle and Java ####
 Install JDK 11.
 
