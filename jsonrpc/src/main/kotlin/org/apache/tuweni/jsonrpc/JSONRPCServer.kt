@@ -20,9 +20,6 @@ package org.apache.tuweni.jsonrpc
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.opentelemetry.api.OpenTelemetry
-import io.opentelemetry.api.trace.SpanKind
-import io.opentelemetry.api.trace.StatusCode
 import io.vertx.core.AsyncResult
 import io.vertx.core.Future
 import io.vertx.core.Handler
@@ -70,7 +67,6 @@ class JSONRPCServer(
   val basicAuthenticationPassword: String? = null,
   val basicAuthRealm: String = "Apache Tuweni JSON-RPC proxy",
   val ipRangeChecker: IPRangeChecker = IPRangeChecker.allowAll(),
-  val openTelemetry: OpenTelemetry = OpenTelemetry.noop(),
   override val coroutineContext: CoroutineContext = Dispatchers.Default,
   val methodHandler: suspend (JSONRPCRequest) -> JSONRPCResponse,
 ) : CoroutineScope {
@@ -133,14 +129,10 @@ class JSONRPCServer(
       router.route().handler(basicAuthHandler)
     }
     router.route().handler { context ->
-      val tracer = openTelemetry.getTracer("jsonrpcserver")
-      val span = tracer.spanBuilder("handleRequest").setSpanKind(SpanKind.SERVER).startSpan()
       val httpRequest = context.request()
       httpRequest.exceptionHandler {
         logger.error(it.message, it)
         httpRequest.response().end(mapper.writeValueAsString(internalError))
-        span.setStatus(StatusCode.ERROR)
-        span.end()
       }
       httpRequest.bodyHandler {
         var requests: Array<JSONRPCRequest>
@@ -152,8 +144,6 @@ class JSONRPCServer(
           } catch (e: IOException) {
             logger.warn("Invalid request", e)
             httpRequest.response().end(mapper.writeValueAsString(parseError))
-            span.setStatus(StatusCode.ERROR)
-            span.end()
             return@bodyHandler
           }
         }
@@ -174,7 +164,6 @@ class JSONRPCServer(
             httpResponse.end(mapper.writeValueAsString(readyResponses))
           }
 
-          span.end()
         }
       }
     }

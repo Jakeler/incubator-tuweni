@@ -19,7 +19,6 @@ package org.apache.tuweni.jsonrpc.app
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.vertx.core.Vertx
 import io.vertx.core.VertxOptions
-import io.vertx.tracing.opentelemetry.OpenTelemetryOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -94,7 +93,7 @@ object JSONRPCApp {
       grpcEndpoint = config.metricsGrpcEndpoint(),
       grpcTimeout = config.metricsGrpcTimeout(),
     )
-    val vertx = Vertx.vertx(VertxOptions().setTracingOptions(OpenTelemetryOptions(metricsService.openTelemetry)))
+    val vertx = Vertx.vertx(VertxOptions())
     val app = JSONRPCApplication(vertx, config, metricsService)
     app.run()
   }
@@ -164,7 +163,6 @@ class JSONRPCApplication(
       config.basicAuthPassword(),
       config.basicAuthRealm(),
       IPRangeChecker.create(config.allowedRanges(), config.rejectedRanges()),
-      metricsService.openTelemetry,
       Executors.newFixedThreadPool(
         config.numberOfThreads()
       ) {
